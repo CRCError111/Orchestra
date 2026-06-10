@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agent Control</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>Agent Control</h1>
+          <p id="nextTask">Loading queue</p>
+        </div>
+        <div class="actions">
+          <span id="refreshStatus" class="muted">Auto refresh on</span>
+          <button id="refreshBtn" title="Refresh state">Refresh</button>
+          <button id="runDryBtn" title="Run next task in dry-run mode">Dry run next</button>
+        </div>
+      </header>
+
+      <section class="metrics" id="metrics"></section>
+      <section class="workers" id="workers"></section>
+
+      <nav class="tabs" aria-label="Views">
+        <button class="tab active" data-view="board">Board</button>
+        <button class="tab" data-view="import">Import</button>
+        <button class="tab" data-view="reports">Reports</button>
+        <button class="tab" data-view="settings">Settings</button>
+      </nav>
+
+      <section id="boardView" class="view">
+        <div class="boardShell">
+          <section class="kanban" id="kanban"></section>
+          <aside class="detailPane">
+            <div id="emptyState" class="emptyState">Select a task</div>
+            <article id="taskDetail" class="taskDetail hidden"></article>
+          </aside>
+        </div>
+      </section>
+
+      <section id="importView" class="view hidden">
+        <section class="importPanel">
+          <div>
+            <h2>Import Numbered Task List</h2>
+            <p class="muted">Paste a human-readable plan. Lines like 1., 1.1, 2) become tasks; nested items depend on their parent.</p>
+          </div>
+          <form id="importForm" class="importForm">
+            <div class="formGrid">
+              <label>
+                Project
+                <input id="importProject" value="orchestrator">
+              </label>
+              <label>
+                Capabilities
+                <input id="importCapabilities" placeholder="python,frontend,tests">
+              </label>
+              <label>
+                Permissions
+                <input id="importPermissions" placeholder="read_workspace,write_files">
+              </label>
+            </div>
+            <label>
+              Task list
+              <textarea id="importText" class="largeText" placeholder="1. Prepare architecture&#10;Describe lifecycle and acceptance.&#10;&#10;1.1 Implement worker registry&#10;&#10;2) Build UI"></textarea>
+            </label>
+            <div class="buttonRow">
+              <button class="primary" type="submit">Import tasks</button>
+              <span id="importResult" class="muted"></span>
+            </div>
+          </form>
+        </section>
+      </section>
+
+      <section id="reportsView" class="view hidden">
+        <section class="reports" id="reports"></section>
+      </section>
+
+      <section id="settingsView" class="view hidden">
+        <section class="settingsGrid">
+          <section class="settingsPanel">
+            <h2>Executor Settings</h2>
+            <p class="muted">Register dialogs as workers and edit display names. If custom name is empty, display name is Project/Dialog.</p>
+            <form id="workerForm" class="importForm">
+              <div class="formGrid">
+                <label>
+                  Worker ID
+                  <input id="workerId" placeholder="dialog-test-1">
+                </label>
+                <label>
+                  Project
+                  <input id="workerProject" value="New project2">
+                </label>
+                <label>
+                  Dialog
+                  <input id="workerDialog" value="Create agent orchestrator">
+                </label>
+              </div>
+              <div class="formGrid">
+                <label>
+                  Label
+                  <input id="workerLabel" placeholder="Internal label">
+                </label>
+                <label>
+                  Custom display name
+                  <input id="workerCustomName" placeholder="Optional user-defined name">
+                </label>
+                <label>
+                  Capabilities
+                  <input id="workerCapabilities" placeholder="python,frontend,tests">
+                </label>
+              </div>
+              <div class="buttonRow">
+                <button class="primary" type="submit">Save worker</button>
+                <span id="workerResult" class="muted"></span>
+              </div>
+            </form>
+            <label class="inlineToggle">
+              <input id="showOfflineWorkers" type="checkbox">
+              Show offline workers
+            </label>
+            <div id="workerEditorList" class="settingsList"></div>
+          </section>
+
+          <section class="settingsPanel">
+            <h2>Telegram & Refresh</h2>
+            <p class="muted">Token is stored locally in the orchestrator SQLite database. Existing token is never shown back in the UI.</p>
+            <form id="settingsForm" class="importForm">
+              <label>
+                Telegram bot token
+                <input id="telegramToken" type="password" placeholder="Leave blank to keep current token">
+              </label>
+              <label>
+                Allowed chat IDs
+                <input id="telegramChats" placeholder="12345,67890">
+              </label>
+              <div class="buttonRow">
+                <button id="fetchTelegramChats" type="button">Fetch recent chats</button>
+                <span id="telegramChatsResult" class="muted"></span>
+              </div>
+              <div id="telegramChatsList" class="settingsList"></div>
+              <label>
+                Auto refresh seconds
+                <input id="autoRefreshSeconds" type="number" min="2" value="5">
+              </label>
+              <div class="buttonRow">
+                <button class="primary" type="submit">Save settings</button>
+                <span id="settingsResult" class="muted"></span>
+              </div>
+            </form>
+          </section>
+
+          <section class="settingsPanel">
+            <h2>Project Colors</h2>
+            <p class="muted">Colors are assigned automatically from project_id. Override them here when several projects share the same board.</p>
+            <div id="projectColorList" class="settingsList"></div>
+          </section>
+
+          <section class="settingsPanel">
+            <h2>Use Cases</h2>
+            <ul class="useCases">
+              <li>Feature chains: backend -> UI -> tests -> docs.</li>
+              <li>Parallel branches across several Codex dialogs.</li>
+              <li>Code review flow: one worker writes, another reviews.</li>
+              <li>Regression and smoke test runs.</li>
+              <li>Release prep: changelog, build, smoke-test, packaging.</li>
+              <li>Documentation: plan, draft, edit, final check.</li>
+              <li>Hardware/firmware pipelines: schematic, ERC/DRC, firmware build, reports.</li>
+              <li>Research tasks: collect facts, verify sources, summarize.</li>
+              <li>Human approval tasks: stop and ask in Telegram.</li>
+            </ul>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

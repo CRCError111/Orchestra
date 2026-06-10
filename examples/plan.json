@@ -1,0 +1,42 @@
+{
+  "tasks": [
+    {
+      "id": "architecture",
+      "project_id": "orchestrator",
+      "title": "Describe the orchestration architecture",
+      "description": "Prepare a concise architecture document for the agent task-control system.",
+      "required_permissions": ["read_workspace", "write_docs"],
+      "required_capabilities": ["architecture", "docs"],
+      "expected_output": "A document that describes task lifecycle, storage, agent contract, acceptance, and Telegram supervision.",
+      "acceptance_criteria": [
+        {
+          "id": "lifecycle",
+          "text": "Task lifecycle states and transitions are described."
+        },
+        {
+          "id": "agent-contract",
+          "text": "Agent input and output JSON contracts are described."
+        }
+      ],
+      "priority": 10,
+      "test_command": "python -m agent_control.cli status"
+    },
+    {
+      "id": "telegram-control",
+      "project_id": "orchestrator",
+      "title": "Wire Telegram operator commands",
+      "description": "Expose task list, task details, notes, approve, block, and resume commands in Telegram.",
+      "required_permissions": ["network_telegram", "read_state", "write_state"],
+      "required_capabilities": ["python", "telegram"],
+      "expected_output": "Telegram bot commands can alter task status and add notes.",
+      "acceptance_criteria": [
+        {
+          "id": "operator-commands",
+          "text": "The operator can list, inspect, approve, block, resume, and comment on tasks."
+        }
+      ],
+      "priority": 20,
+      "depends_on": ["architecture"]
+    }
+  ]
+}

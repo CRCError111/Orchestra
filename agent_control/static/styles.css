@@ -1,0 +1,680 @@
+:root {
+  --bg: #f6f7f4;
+  --panel: #ffffff;
+  --ink: #1c2522;
+  --muted: #63706b;
+  --line: #dce2dc;
+  --accent: #1f7a68;
+  --accent-strong: #14594d;
+  --warn: #a15c18;
+  --danger: #a4343a;
+  --done: #357342;
+  --review: #6c5fba;
+  --shadow: 0 10px 30px rgba(29, 39, 35, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
+button,
+select,
+textarea,
+input {
+  font: inherit;
+}
+
+button,
+select {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 6px;
+  min-height: 36px;
+}
+
+button {
+  cursor: pointer;
+  padding: 0 12px;
+  font-weight: 650;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+button:hover,
+select:hover {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.shell {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 2px 16px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+h3 {
+  font-size: 15px;
+}
+
+.topbar p {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.actions,
+.buttonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.muted {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(110px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.workers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.worker {
+  display: block;
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  text-align: left;
+  border-left: 4px solid var(--project-color, var(--accent));
+}
+
+.workerHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 8px;
+}
+
+.workerTitle {
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.workerMeta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.metric {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+}
+
+.metric span {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tab {
+  min-width: 92px;
+}
+
+.tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.boardShell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 460px);
+  gap: 14px;
+  min-height: calc(100vh - 242px);
+}
+
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(220px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.kanbanColumn,
+.detailPane,
+.importPanel,
+.reportPanel,
+.settingsPanel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  min-height: 0;
+}
+
+.columnHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-radius: 8px 8px 0 0;
+  background: #fbfcfa;
+  text-align: left;
+}
+
+.columnHead span {
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.kanbanColumn.collapsed {
+  min-width: 120px;
+}
+
+.kanbanColumn.collapsed .columnTasks {
+  display: none;
+}
+
+.kanbanColumn.collapsed .columnHead {
+  border-bottom: 0;
+  border-radius: 8px;
+}
+
+.columnTasks {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 10px;
+  max-height: calc(100vh - 300px);
+  overflow: auto;
+}
+
+.columnTasks.dropTarget {
+  outline: 2px dashed var(--accent);
+  outline-offset: -6px;
+  background: #edf5f2;
+}
+
+.kanbanCard {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  padding: 10px;
+  text-align: left;
+  border-radius: 8px;
+  background: #fbfcfa;
+  border-left: 4px solid var(--project-color, var(--accent));
+}
+
+.kanbanCard.active {
+  background: #edf5f2;
+  border-color: var(--accent);
+}
+
+.kanbanCard.dragging {
+  opacity: 0.55;
+}
+
+.columnEmpty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 10px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.taskTitle {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.taskMeta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.projectDot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--project-color, var(--accent));
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.badge {
+  align-self: start;
+  border-radius: 999px;
+  color: white;
+  font-size: 11px;
+  font-weight: 750;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.pending {
+  background: #58706a;
+}
+
+.running {
+  background: var(--accent);
+}
+
+.review {
+  background: var(--review);
+}
+
+.blocked {
+  background: var(--warn);
+}
+
+.done {
+  background: var(--done);
+}
+
+.failed {
+  background: var(--danger);
+}
+
+.idle {
+  background: #58706a;
+}
+
+.busy {
+  background: var(--accent);
+}
+
+.offline {
+  background: #77716a;
+}
+
+.detailPane {
+  padding: 18px;
+  overflow: auto;
+}
+
+.emptyState {
+  height: 100%;
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+.hidden {
+  display: none;
+}
+
+.taskDetail {
+  display: grid;
+  gap: 18px;
+}
+
+.detailHead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.detailHead h2 {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.idLine {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.section {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.section p {
+  color: var(--muted);
+  line-height: 1.45;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.criteria,
+.events,
+.notes,
+.workResult {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.criterion,
+.event,
+.note,
+.resultBlock {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.criterion strong,
+.event strong,
+.resultBlock strong {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+textarea,
+input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  resize: vertical;
+  min-height: 78px;
+  color: var(--ink);
+}
+
+input {
+  min-height: 40px;
+  resize: none;
+}
+
+.largeText {
+  min-height: 360px;
+}
+
+.importPanel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.importForm {
+  display: grid;
+  gap: 14px;
+}
+
+.importForm label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.settingsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+  gap: 14px;
+}
+
+.settingsPanel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 18px;
+}
+
+.settingsList {
+  display: grid;
+  gap: 8px;
+}
+
+.settingsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.settingsRowMain {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px;
+  text-align: left;
+}
+
+.settingsRowMain span {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.inlineToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.inlineToggle input {
+  width: auto;
+  min-height: 0;
+}
+
+.colorInput {
+  width: 44px;
+  min-height: 36px;
+  padding: 3px;
+}
+
+.useCases {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.formRow {
+  display: grid;
+  gap: 8px;
+}
+
+.priorityForm {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.priorityForm label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.event pre,
+.reportRow pre,
+.resultBlock pre {
+  white-space: pre-wrap;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.reportSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.reportGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.reportPanel {
+  padding: 14px;
+}
+
+.reportPanel h2 {
+  margin-bottom: 10px;
+}
+
+.reportRow {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.reportTitle {
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.compact {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .topbar,
+  .detailHead {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .boardShell,
+  .reportGrid,
+  .formGrid,
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .kanban {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .columnTasks {
+    max-height: none;
+  }
+}

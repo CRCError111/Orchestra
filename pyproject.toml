@@ -1,0 +1,10 @@
+[project]
+name = "agent-control"
+version = "0.1.0"
+description = "A small task orchestrator for agent work plans, permissions, acceptance checks, and Telegram supervision."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+agent-control = "agent_control.cli:main"
+
