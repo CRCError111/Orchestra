@@ -135,6 +135,16 @@
                 Allowed chat IDs
                 <input id="telegramChats" placeholder="12345,67890">
               </label>
+              <label>
+                Telegram proxy URL
+                <input id="telegramProxyUrl" placeholder="Optional HTTP proxy, e.g. http://127.0.0.1:7890">
+              </label>
+              <p class="muted">Use an HTTP/HTTPS proxy here. SOCKS5 ports such as 1080 are not supported directly unless your proxy app also exposes an HTTP port.</p>
+              <label>
+                Telegram API IP override
+                <input id="telegramApiIpOverride" placeholder="Optional, e.g. 149.154.167.220">
+              </label>
+              <p class="muted">Use this when api.telegram.org resolves to a blocked IP but another Telegram API IP is reachable. TLS/SNI still uses api.telegram.org.</p>
               <div class="buttonRow">
                 <button id="fetchTelegramChats" type="button">Fetch recent chats</button>
                 <span id="telegramChatsResult" class="muted"></span>

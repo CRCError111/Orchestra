@@ -50,6 +50,8 @@ const els = {
   telegramChatsList: document.querySelector("#telegramChatsList"),
   telegramToken: document.querySelector("#telegramToken"),
   telegramChats: document.querySelector("#telegramChats"),
+  telegramProxyUrl: document.querySelector("#telegramProxyUrl"),
+  telegramApiIpOverride: document.querySelector("#telegramApiIpOverride"),
   autoRefreshSeconds: document.querySelector("#autoRefreshSeconds"),
   settingsResult: document.querySelector("#settingsResult"),
   projectColorList: document.querySelector("#projectColorList"),
@@ -359,6 +361,8 @@ function renderSettings() {
   const settings = state.settings || {};
   if (!document.activeElement || !document.activeElement.closest("#settingsView")) {
     els.telegramChats.value = settings.telegram_allowed_chat_ids || "";
+    els.telegramProxyUrl.value = settings.telegram_proxy_url || "";
+    els.telegramApiIpOverride.value = settings.telegram_api_ip_override || "";
     els.autoRefreshSeconds.value = settings.auto_refresh_seconds || "5";
   }
   els.refreshStatus.textContent = `Auto refresh: ${settings.auto_refresh_seconds || 5}s`;
@@ -607,9 +611,11 @@ els.workerForm.addEventListener("submit", async (event) => {
 els.settingsForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   await saveSettings({
-    telegram_bot_token: els.telegramToken.value,
-    telegram_allowed_chat_ids: els.telegramChats.value,
-    auto_refresh_seconds: els.autoRefreshSeconds.value || "5",
+      telegram_bot_token: els.telegramToken.value,
+      telegram_allowed_chat_ids: els.telegramChats.value,
+      telegram_proxy_url: els.telegramProxyUrl.value,
+      telegram_api_ip_override: els.telegramApiIpOverride.value,
+      auto_refresh_seconds: els.autoRefreshSeconds.value || "5",
   });
   els.telegramToken.value = "";
   els.settingsResult.textContent = "Saved";
@@ -620,6 +626,8 @@ async function saveSettings(patch) {
     method: "POST",
     body: JSON.stringify({
       telegram_allowed_chat_ids: els.telegramChats.value,
+      telegram_proxy_url: els.telegramProxyUrl.value,
+      telegram_api_ip_override: els.telegramApiIpOverride.value,
       auto_refresh_seconds: els.autoRefreshSeconds.value || "5",
       project_colors: state.settings?.project_colors || "{}",
       ...patch,
@@ -653,7 +661,7 @@ els.fetchTelegramChats.addEventListener("click", async () => {
       });
     });
   } catch (error) {
-    els.telegramChatsResult.textContent = error.message;
+    els.telegramChatsResult.textContent = `${error.message}. Check Telegram token, network, VPN, firewall, or Telegram proxy URL.`;
   }
 });
 

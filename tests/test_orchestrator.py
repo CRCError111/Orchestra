@@ -281,6 +281,8 @@ class OrchestratorTests(unittest.TestCase):
             {
                 "telegram_bot_token": "secret-token",
                 "telegram_allowed_chat_ids": "1,2",
+                "telegram_proxy_url": "http://127.0.0.1:1080",
+                "telegram_api_ip_override": "149.154.167.220",
                 "auto_refresh_seconds": "7",
                 "project_colors": "{\"default\":\"#123456\"}",
             }
@@ -291,6 +293,8 @@ class OrchestratorTests(unittest.TestCase):
         self.assertEqual(payload["settings"]["telegram_bot_token"], "")
         self.assertEqual(payload["settings"]["telegram_bot_token_set"], "true")
         self.assertEqual(payload["settings"]["telegram_allowed_chat_ids"], "1,2")
+        self.assertEqual(payload["settings"]["telegram_proxy_url"], "http://127.0.0.1:1080")
+        self.assertEqual(payload["settings"]["telegram_api_ip_override"], "149.154.167.220")
         self.assertEqual(payload["settings"]["auto_refresh_seconds"], "7")
         self.assertEqual(payload["settings"]["project_colors"], "{\"default\":\"#123456\"}")
 
@@ -301,6 +305,8 @@ class OrchestratorTests(unittest.TestCase):
             {
                 "telegram_bot_token": "123:abc",
                 "telegram_allowed_chat_ids": "100,-200",
+                "telegram_proxy_url": "http://127.0.0.1:1080",
+                "telegram_api_ip_override": "149.154.167.220",
             }
         )
 
@@ -308,6 +314,8 @@ class OrchestratorTests(unittest.TestCase):
 
         self.assertEqual(bot.token, "123:abc")
         self.assertEqual(bot.allowed_chat_ids, {100, -200})
+        self.assertEqual(bot.proxy_url, "http://127.0.0.1:1080")
+        self.assertEqual(bot.api_ip_override, "149.154.167.220")
 
     def test_parse_single_level_numbered_plan(self) -> None:
         root = test_root()

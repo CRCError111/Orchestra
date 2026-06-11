@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import http.client
 import json
 import os
+import socket
+import ssl
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -11,11 +15,29 @@ from .store import Store
 
 
 class TelegramBot:
-    def __init__(self, store: Store, token: str, allowed_chat_ids: set[int] | None = None) -> None:
+    def __init__(
+        self,
+        store: Store,
+        token: str,
+        allowed_chat_ids: set[int] | None = None,
+        proxy_url: str = "",
+        api_ip_override: str = "",
+    ) -> None:
         self.store = store
         self.token = token
         self.allowed_chat_ids = allowed_chat_ids
         self.base_url = f"https://api.telegram.org/bot{token}"
+        self.proxy_url = proxy_url
+        self.api_ip_override = api_ip_override
+        if proxy_url.lower().startswith(("socks://", "socks5://", "socks4://")):
+            raise RuntimeError("SOCKS proxies are not supported by the built-in HTTP client. Use an HTTP proxy URL.")
+        if proxy_url:
+            self.opener = urllib.request.build_opener(
+                urllib.request.ProxyHandler({"http": proxy_url, "https": proxy_url})
+            )
+        else:
+            # Do not inherit broken or placeholder proxies from the parent process.
+            self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
     @classmethod
     def from_env(cls, store: Store) -> "TelegramBot":
@@ -34,7 +56,9 @@ class TelegramBot:
             raise RuntimeError("Set telegram_bot_token in Settings or TELEGRAM_BOT_TOKEN.")
         raw_ids = settings.get("telegram_allowed_chat_ids") or os.environ.get("TELEGRAM_ALLOWED_CHAT_IDS", "")
         allowed = {int(item.strip()) for item in raw_ids.split(",") if item.strip()} or None
-        return cls(store, token, allowed)
+        proxy_url = settings.get("telegram_proxy_url", "").strip()
+        api_ip_override = settings.get("telegram_api_ip_override", "").strip()
+        return cls(store, token, allowed, proxy_url, api_ip_override)
 
     def recent_chats(self) -> list[dict]:
         updates = self._api("getUpdates", {"timeout": 1})
@@ -129,6 +153,50 @@ class TelegramBot:
 
     def _api(self, method: str, params: dict) -> dict:
         data = urllib.parse.urlencode(params).encode("utf-8")
+        if self.api_ip_override and not self.proxy_url:
+            return self._api_via_ip_override(method, data)
         request = urllib.request.Request(f"{self.base_url}/{method}", data=data)
-        with urllib.request.urlopen(request, timeout=35) as response:
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with self.opener.open(request, timeout=35) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.URLError as exc:
+            target = self.proxy_url or "direct connection"
+            raise RuntimeError(f"Telegram API request failed via {target}: {exc.reason}") from exc
+
+    def _api_via_ip_override(self, method: str, data: bytes) -> dict:
+        connection = _SniIpHTTPSConnection(
+            host="api.telegram.org",
+            ip_override=self.api_ip_override,
+            timeout=35,
+        )
+        try:
+            connection.request(
+                "POST",
+                f"/bot{self.token}/{method}",
+                body=data,
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Host": "api.telegram.org",
+                },
+            )
+            response = connection.getresponse()
+            body = response.read().decode("utf-8")
+            if response.status >= 400:
+                raise RuntimeError(f"Telegram API HTTP {response.status}: {body[:500]}")
+            return json.loads(body)
+        except OSError as exc:
+            raise RuntimeError(
+                f"Telegram API request failed via IP override {self.api_ip_override}: {exc}"
+            ) from exc
+        finally:
+            connection.close()
+
+
+class _SniIpHTTPSConnection(http.client.HTTPSConnection):
+    def __init__(self, host: str, ip_override: str, timeout: int) -> None:
+        super().__init__(host=host, timeout=timeout, context=ssl.create_default_context())
+        self.ip_override = ip_override
+
+    def connect(self) -> None:
+        sock = socket.create_connection((self.ip_override, self.port), self.timeout, self.source_address)
+        self.sock = self._context.wrap_socket(sock, server_hostname=self.host)

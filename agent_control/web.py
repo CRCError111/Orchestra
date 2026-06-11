@@ -58,6 +58,8 @@ def settings_payload(store: Store) -> dict:
     settings = {
         "telegram_bot_token": "",
         "telegram_allowed_chat_ids": "",
+        "telegram_proxy_url": "",
+        "telegram_api_ip_override": "",
         "auto_refresh_seconds": "5",
         "project_colors": "{}",
     }
@@ -192,6 +194,8 @@ class WebHandler(BaseHTTPRequestHandler):
             def action(store: Store) -> None:
                 values = {
                     "telegram_allowed_chat_ids": str(body.get("telegram_allowed_chat_ids", "")),
+                    "telegram_proxy_url": str(body.get("telegram_proxy_url", "")),
+                    "telegram_api_ip_override": str(body.get("telegram_api_ip_override", "")),
                     "auto_refresh_seconds": str(body.get("auto_refresh_seconds", "5")),
                     "project_colors": str(body.get("project_colors", "{}")),
                 }
